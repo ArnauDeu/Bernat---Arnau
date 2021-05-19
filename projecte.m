@@ -16,10 +16,14 @@ cd C:\Users\ernu1\Desktop\Universitat\PSIV\PROJECTE
 v = VideoReader("video2.mp4");
 
 frames = read(v,[1,inf]);
+%automatitazició
+siz = size(frames);
+sip = [siz(1);siz(2);siz(4)];
 
-grup1 = zeros(352,640,374);
-copia = zeros(352,640,3,374);
-for i = 1:374
+grup1 = zeros(sip);
+copia = zeros(siz);
+
+for i = 1:siz(4)
    copia(:,:,:,i) = frames(:,:,:,i);
    grup1(:,:,i) = rgb2gray(frames(:,:,:,i));
 end
@@ -35,16 +39,15 @@ mitjana = mean(grup1, 3);
 desv = std(grup1, [],  3);
 
 
-
-vermells = zeros(352,640, 374);
-substraccio = zeros(352,640,374);
+vermells = zeros(sip);
+substraccio = zeros(sip);
 
 alpha = 1;
 beta = 27;
 
 
 
-for g = 1:374
+for g = 1:siz(4)
     substraccio(:,:,g) = abs(mitjana - grup1(:,:,g)) > (desv * alpha + beta);
 end
 
@@ -59,7 +62,7 @@ a = 0;
 b = 0;
 p = [];
 
-for g = 1:374
+for g = 1:siz(4)
     [a,b,p, vermells(:,:,g), copia(:,:,1,g)] = getverm(a, b, p, substraccio(:,:,g),copia(:,:,1,g));
 end
 
@@ -71,10 +74,10 @@ end
 % DEFINIM LA TRAJECTÒRIA PER EVITAR ALTA REDUNDANCIA I REPETICIÓ DE BUCLES 
 %
 
-vermells2 = zeros(352,640,3, 374);
+vermells2 = zeros(siz);
 
 
-for x = 1:374
+for x = 1:siz(4)
     if x ~= 1
         vermells2(:,:,1,x) = vermells2(:,:,1,x-1) + vermells(:,:,x);
     else
@@ -100,7 +103,7 @@ for x = 4:tamany(1)
     
     prox_valors = [d2(1)-d1(1);d2(2)-d2(2)];
     
-    next = moviment(3,1
+    next = moviment(3,1);
     
     %distancies anteriors
     moviment = [moviment(x-3:x-1,:);p(x, :)];
@@ -120,9 +123,9 @@ open(video);
 open(video2);
 open(video3);
 
-img = zeros(352,640);
-img2 = zeros(352,640,3);
-img3 = zeros(352,640,3); 
+img = zeros(sip(1), sip(2));
+img2 = zeros(sip);
+img3 = zeros(sip); 
 
 for i =1:374
     img = substraccio(:,:,i);
@@ -146,9 +149,9 @@ totalx = 0;
 totaly = 0;
 count = 0;
 % CALCUL DEL CENTRE DE MASSES DE L'OBJECTE
-
-for x = 1:352
-    for y = 1:640
+siz = size(img);
+for x = 1:siz(1)
+    for y = 1:siz(2)
         if img(x,y) == 1
         totalx = totalx + x;
         totaly = totaly + y;
@@ -157,12 +160,14 @@ for x = 1:352
     end
 end
 
-sortida = zeros(352, 640);
+sortida = zeros(siz);
 
-% DETECCIÓ D'OBJECTE EN IMATGE.
+% FEFINICIÓ TRAJECTÒRIA .
 if count ~= 0
     x = round(totalx/count);
     y = round(totaly/count);
+    
+    % GUARDEM ELS PUNTS PER DESPRES GENERAR LA PREDICCIÓ
     p = [p;[x,y]];
     if a == 0
         a = x;
@@ -173,7 +178,7 @@ if count ~= 0
     
     while (x ~= a || y ~= b )
         sortida(a,b) = 255;
-        copia(a,b) = 254;
+        copia(a,b) = 255;
         if (x ~= a)
             res_x = x - a;
             res_x = res_x / abs(res_x);
@@ -193,6 +198,9 @@ if count ~= 0
     end
         
         
+else
+    a = 0;
+    b = 0;
 end
 end
 
