@@ -26,7 +26,7 @@ cd C:\Users\ernu1\Desktop\Universitat\PSIV\PROJECTE
 %v = VideoReader("video1-11.mp4");
 %v = VideoReader("video1-12.mp4");
 %v = VideoReader("video1-13.mp4");
-v = VideoReader("video1-14.mp4");
+%v = VideoReader("video1-14.mp4");
 
 frames = read(v,[1,inf]);
 tamany = size(frames);
@@ -36,7 +36,7 @@ for i = 1:tamany(4)
    grup1(:,:,i) = rgb2gray(frames(:,:,:,i));
 end
 
-%% Homografia bird's eye --> birdeye
+%% TASCA 2.0 --> GENERACIÓ HOMOGRAFIA --> birdeye
 % Càlcul background de la homografia
 base = copia(:,:,:,1);
 imshow(base);
@@ -104,7 +104,7 @@ for i = 1:a4
    grup2(:,:,i) = rgb2gray(birdeye(:,:,:,i));
 end
 
-%% TASCA 2 - SISTEMA DE CAPTACIÓ DELS OBJECTES
+%% TASCA 2.1 - SISTEMA DE CAPTACIÓ DELS OBJECTES
 % Agafem els 5 primers frames per fer el train i 
 % el backgorund substracting
 
@@ -131,9 +131,6 @@ for g = 1:tamany(4)
     substraccio2(:,:,g) = abs(base2 - grup2(:,:,g)) > (desv2 * alpha + beta);
 end
 
-% EXTRET PER SEPARAR ELS OBJECTIUS DEL PROJECTE DE DINS DEL FOR --> [a,b,vermells(:,:,g)] = getverm(a, b, substraccio(:,:,g));
-
-
 
 
 
@@ -153,7 +150,7 @@ for g = 1:tamany(4)
 end
 
 
-%% TASCA 4 - SISTEMA PER REPRESENTAR LA TRAJECTORIA SOBRE EL VÍDEO
+%% TASCA 4.1 - SISTEMA PER REPRESENTAR LA TRAJECTORIA SOBRE EL VÍDEO
 %
 % HEM ESTAT PENSANT FER LA INCORPORACIÓ PRÈVIA, A LA VEGADA QUE DETECTEM I
 % DEFINIM LA TRAJECTÒRIA PER EVITAR ALTA REDUNDANCIA I REPETICIÓ DE BUCLES 
@@ -172,9 +169,11 @@ for x = 1:a4
         vermellsfinal2(:,:,1,1) = vermells2(:,:,1);
     end
 end
-    
+%% TASCA 4.2 - SISTEMA PER REPRESENTAR EL SEGUIMENT DE L'OBJECTE DINS D'UN CERCLE
 birdeye2 = incorporar(p2, birdeye);
 copia2 = incorporar(p, copia);
+
+%% TASCA 4.3 - SISTEMA PER REPRESENTAR EL CÀLCUL I SEGUIMENT DELS CANVIS DE TRAJECTÒRIA DE L'OBJECTE
 [imtest2,birdeye3] = canvis_direccio(p2, birdeye2);
 [imtest,copia2] = canvis_direccio(p, copia2);
 %% TASCA FINAL - GUARDAT DEL VIDEO
@@ -197,9 +196,6 @@ writeVideo(videot2, vermell2);
 
 close(videot);
 close(videot2);
-
-
-% part 1
 
 
 videoc = VideoWriter('C:\Users\ernu1\Desktop\Universitat\PSIV\PROJECTE\video_compost.mp4','MPEG-4');
@@ -256,6 +252,7 @@ close(videof2);
 
 close(videof3);
 close(videof4);
+
 
 %% FUNCIONS DEL CODI
 
@@ -322,6 +319,8 @@ end
 p = [p;[x,y]];
 end
 
+%FUNCIO2 -> TASCA 4.2 --> CERCLE AL VOLTANT DE L'OBJECTE
+
 function matriu = incorporar(p, matriu)
     [pa1, pa2] = size(p);
     for i = 1:pa1
@@ -331,7 +330,8 @@ function matriu = incorporar(p, matriu)
     end
 end
 
-
+%FUNCIO2 -> TASCA 4.3 --> DETECCIO CANVIS DE DIRECCIÓ I INCORPORACIÓ DE LA
+%                         MARCA EN AQUESTS
 
 function [img, matriu] = canvis_direccio(p, matriu)
     signe1 = 0;
